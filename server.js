@@ -29,7 +29,7 @@ app.use(
     crossOriginResourcePolicy: false,
   })
 );
-const allowedOrigins = ["https://job-tracker-frontend-theta.vercel.app/"];
+const allowedOrigins = ["https://job-tracker-frontend-theta.vercel.app"];
 app.use(
   cors({
     origin: allowedOrigins,
