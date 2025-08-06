@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.js";
 import jobsRoutes from "./routes/jobs.js";
@@ -19,19 +20,13 @@ connectDB();
 
 const app = express();
 
-// Security headers
-app.use(
-  helmet({
-    crossOriginResourcePolicy: false,
-  })
-);
-
+// ✅ Use cors with proper config
 const allowedOrigins = [
   "http://localhost:3000",
   "https://job-tracker-frontend-theta.vercel.app",
 ];
 
-const corsOptions = {
+app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
@@ -39,32 +34,41 @@ const corsOptions = {
       callback(new Error("Not allowed by CORS"));
     }
   },
+  methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS",
+  allowedHeaders: "Content-Type,Authorization",
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
+}));
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Preflight
+// ✅ Allow OPTIONS for all routes (fixes PATCH issue)
+app.options("*", cors());
 
+// ✅ Helmet for security
+app.use(helmet({
+  crossOriginResourcePolicy: false,
+}));
+
+// ✅ Body parsing
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api", profileRoutes);
 app.use("/api", uploadRoutes);
 
+// ✅ Static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {
   res.send("Welcome to Job Tracker API");
 });
 
-//Global error handler
+// ✅ Global error handler
 app.use(errorHandler);
 
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
