@@ -30,7 +30,6 @@ export const uploadAvatar = [
         return res.status(400).json({ message: "No file uploaded" });
       }
 
-      // req.file.path is the Cloudinary URL
       return res.status(200).json({ avatarUrl: req.file.path });
     } catch (error) {
       return res.status(500).json({ message: "Upload failed", error });

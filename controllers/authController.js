@@ -34,36 +34,14 @@ export const registerUser = async (req, res, next) => {
   }
 };
 
-// export const loginUser = async (req, res, next) => {
-//   try {
-//     const { email, password } = req.body;
-
-//     const user = await User.findOne({ email });
-//     if (user && (await user.matchPassword(password))) {
-//       return res.json({
-//         _id: user._id,
-//         name: user.name,
-//         email: user.email,
-//         token: generateToken(user._id),
-//       });
-//     } else {
-//       return res.status(401).json({ message: "Invalid email or password" });
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 export const loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
-    console.log("📥 Login request:", email, password);
 
     const user = await User.findOne({ email });
-    console.log("👤 Found user:", user ? user.email : "No user");
 
     if (user) {
       const isMatch = await user.matchPassword(password);
-      console.log("🔐 Password match:", isMatch);
 
       if (isMatch) {
         return res.json({
@@ -75,14 +53,12 @@ export const loginUser = async (req, res, next) => {
       }
     }
 
-    console.log("❌ Login failed");
     return res.status(401).json({ message: "Invalid email or password" });
   } catch (error) {
     console.error("⚠️ Login error:", error.message);
     next(error);
   }
 };
-
 
 export const updateProfile = async (req, res, next) => {
   try {

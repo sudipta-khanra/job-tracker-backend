@@ -41,11 +41,6 @@ export const getJobs = async (req, res, next) => {
 
 export const updateJob = async (req, res, next) => {
   try {
-    console.log("Update job called");
-    console.log("User ID:", req.user._id);
-    console.log("Job ID (param):", req.params.id);
-    console.log("Request body:", req.body);
-
     const { id: jobId } = req.params;
     const { position, company, status, jobType, location } = req.body;
 

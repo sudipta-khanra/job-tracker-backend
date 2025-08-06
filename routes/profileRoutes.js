@@ -17,7 +17,6 @@ router.get("/profile", protect, async (req, res) => {
   }
 });
 
-// POST avatar upload
 router.post(
   "/profile/avatar",
   protect,

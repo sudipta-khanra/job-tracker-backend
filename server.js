@@ -19,17 +19,16 @@ connectDB();
 
 const app = express();
 
-// 🛡️ Security headers
+// Security headers
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
   })
 );
 
-// ✅ CORS Configuration
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://job-tracker-frontend-theta.vercel.app", // <-- Add your production frontend here
+  "https://job-tracker-frontend-theta.vercel.app",
 ];
 
 const corsOptions = {
@@ -45,32 +44,26 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-// ✅ Apply CORS middleware
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions)); // Preflight
 
-// 🔧 Express middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🔗 Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api", profileRoutes);
 app.use("/api", uploadRoutes);
 
-// 🖼️ Serve static files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// 🔁 Health check route
 app.get("/", (req, res) => {
   res.send("Welcome to Job Tracker API");
 });
 
-// ❌ Global error handler
+//Global error handler
 app.use(errorHandler);
 
-// 🚀 Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
