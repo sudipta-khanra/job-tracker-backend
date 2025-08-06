@@ -14,47 +14,63 @@ import uploadRoutes from "./routes/upload.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load environment variables from .env
 dotenv.config();
-
-//Connect to MongoDB
 connectDB();
 
-// Create Express app
 const app = express();
 
-// Middleware
+// 🛡️ Security headers
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
   })
 );
-const allowedOrigins = ["https://job-tracker-frontend-theta.vercel.app"];
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
+
+// ✅ CORS Configuration
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://job-tracker-frontend-theta.vercel.app", // <-- Add your production frontend here
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+// ✅ Apply CORS middleware
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Preflight
+
+// 🔧 Express middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", (req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// 🔗 Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/jobs", jobsRoutes);
 app.use("/api", profileRoutes);
 app.use("/api", uploadRoutes);
 
+// 🖼️ Serve static files
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// 🔁 Health check route
 app.get("/", (req, res) => {
   res.send("Welcome to Job Tracker API");
 });
 
+// ❌ Global error handler
 app.use(errorHandler);
 
+// 🚀 Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
